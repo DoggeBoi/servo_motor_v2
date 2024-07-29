@@ -75,6 +75,7 @@ osThreadId servoUpdateHandle;
 osThreadId canFifo0Handle;
 osThreadId canFifo1Handle;
 osThreadId healthCheckHandle;
+osThreadId dataOutputHandle;
 /* USER CODE BEGIN PV */
 
 SERVO_CONTROL servo;
@@ -97,6 +98,7 @@ void StartServoUpdate(void const * argument);
 void StartCanFifo0(void const * argument);
 void StartCanFifo1(void const * argument);
 void StartHealthCheck(void const * argument);
+void StartDataOutput(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -228,6 +230,10 @@ int main(void)
   /* definition and creation of healthCheck */
   osThreadDef(healthCheck, StartHealthCheck, osPriorityHigh, 0, 128);
   healthCheckHandle = osThreadCreate(osThread(healthCheck), NULL);
+
+  /* definition and creation of dataOutput */
+  osThreadDef(dataOutput, StartDataOutput, osPriorityBelowNormal, 0, 128);
+  dataOutputHandle = osThreadCreate(osThread(dataOutput), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
 
@@ -581,7 +587,7 @@ static void MX_CAN_Init(void)
   hcan.Init.TimeTriggeredMode = DISABLE;
   hcan.Init.AutoBusOff = DISABLE;
   hcan.Init.AutoWakeUp = DISABLE;
-  hcan.Init.AutoRetransmission = DISABLE;
+  hcan.Init.AutoRetransmission = ENABLE;
   hcan.Init.ReceiveFifoLocked = DISABLE;
   hcan.Init.TransmitFifoPriority = DISABLE;
   if (HAL_CAN_Init(&hcan) != HAL_OK)
@@ -919,13 +925,42 @@ void StartHealthCheck(void const * argument)
 	/*   Check connection and disable servo if failed*/
 	servoConnectionCheck(&servo);
 
-    osDelay(SERVO_CONNECTION_INTERVAL);
+    osDelay(SERVO_CHECK_INTERVAL);
 
   }
 
   osThreadTerminate( NULL );		// In case of accidental break from for loop
 
   /* USER CODE END StartHealthCheck */
+}
+
+/* USER CODE BEGIN Header_StartDataOutput */
+/**
+* @brief Function implementing the dataOutput thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartDataOutput */
+void StartDataOutput(void const * argument)
+{
+  /* USER CODE BEGIN StartDataOutput */
+  /* Infinite loop */
+  for(;;)
+  {
+
+	  for ( uint8_t i = 0; i < 3; i++ ) {
+
+		  readStandard(&servo, PRIORITY_MODERATE, i);
+
+	  }
+
+    osDelay(SERVO_CHECK_INTERVAL);
+
+  }
+
+  osThreadTerminate( NULL );		// In case of accidental break from for loop
+
+  /* USER CODE END StartDataOutput */
 }
 
 /**

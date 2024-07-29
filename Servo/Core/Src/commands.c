@@ -295,19 +295,49 @@ void processCanMessages(SERVO_CONTROL *servo, uint32_t RxFifo) {
 
 void readStandard(SERVO_CONTROL *servo, uint8_t priority, uint8_t dataPackId) {
 
-	/*   Initialise address list   */
-	uint8_t addressList[] = {3, 27, 28, 31};
+	/*   Initialise address lists   */
+	uint8_t read1[] = {3, 27, 28, 31};
+	uint8_t read2[] = {6, 7, 8, 9};
+	uint8_t read3[] = {12, 13, 29, 45, 46};
+	uint8_t read4[] = {32, 34, 36 ,38};
 
-	//MORE ADRESSES
+	/*   Initialise select list parameters   */
+	uint8_t *selectedList;
+	uint8_t  selectedListLenght;
 
-	/*   Calculate list length   */
-	uint8_t listLenght = sizeof(addressList) / sizeof(addressList[0]);
+	/*   Select list based on input parameter   */
+	switch (dataPackId) {
+
+		case 0:
+			selectedList	 	= read1;
+			selectedListLenght 	= 4;
+			break;
+
+		case 1:
+			selectedList	 	= read2;
+			selectedListLenght 	= 4;
+			break;
+
+		case 2:
+			selectedList	 	= read3;
+			selectedListLenght 	= 5;
+			break;
+
+		case 3:
+			selectedList	 	= read4;
+			selectedListLenght 	= 4;
+			break;
+
+		default:
+			return;
+
+	}
 
 	/*   Initialise transmission buffer   */
 	uint8_t TxBuf[8];
 
 	/*   Read back written values   */
-	configJoin(servo, TxBuf, addressList, listLenght);
+	configJoin(servo, TxBuf, selectedList, selectedListLenght);
 
 	/*   Send back response frame to confirm change   */
 	CAN_SendDataFrame(&servo->can, TxBuf, ( sizeof( TxBuf ) / sizeof( uint8_t ) ), priority, 4 + dataPackId);   // Sets data/operation identifier based on dataPackId

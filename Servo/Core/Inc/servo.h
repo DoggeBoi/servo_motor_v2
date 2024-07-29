@@ -43,11 +43,15 @@
 
 
 /*   Base PID loop sample interval and filter constant  */
-#define SERVO_UPDATE_INTERVAL		4						// 4 ms
+#define SERVO_UPDATE_INTERVAL		4						// 4 ms 250Hz
 
 
 /*   Connection check interval   */
-#define SERVO_CONNECTION_INTERVAL	500
+#define SERVO_CHECK_INTERVAL	500
+
+
+/*   Data output interval   */
+#define SERVO_CHECK_INTERVAL	20			// 50Hz // At what rate to send all 4 standard read data packs
 
 
 /*   Error value   */
