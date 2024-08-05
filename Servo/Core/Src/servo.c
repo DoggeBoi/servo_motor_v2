@@ -193,8 +193,11 @@ void torqueEnable(SERVO_CONTROL *servo, uint8_t direction) {
 
 	servo->motionDirection = direction;
 
+	AS5048A_InvertVal(&servo->encoder, direction);
 	AS5048A_ReadAngle(&servo->encoder);
+
 	servo->goalPosition = servo->encoder.angle;
+
 	servo->torqueEnable = SERVO_TORQUE_ENABLE;
 	pidIntegratorEnable(&servo->PID);
 }

@@ -133,6 +133,14 @@ void AS5048A_SetZeroPosition(AS5048A *encoder) {
 }
 
 
+void AS5048A_InvertVal(AS5048A *encoder, uint8_t invert) {
+
+	/*   Angle data inversion variable   */
+	encoder->inverted 	= 	invert;
+
+}
+
+
 void AS5048A_ReadAngle(AS5048A *encoder){
 
 	/*   Initialise raw data variable   */

@@ -63,6 +63,10 @@ void AS5048A_ReadAngle(AS5048A *encoder);
 void AS5048A_SetZeroPosition(AS5048A *encoder);
 
 
+/*   Change inversion value   */
+void AS5048A_InvertVal(AS5048A *encoder, uint8_t invert);
+
+
 /*   SPI parity calculator   */
 uint8_t CalcParityEven(uint16_t data);
 

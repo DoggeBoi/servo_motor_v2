@@ -51,7 +51,7 @@
 
 
 /*   Data output interval   */
-#define SERVO_CHECK_INTERVAL	20			// 50Hz // At what rate to send all 4 standard read data packs
+#define SERVO_DATA_INTERVAL	20			// 50Hz // At what rate to send all 4 standard read data packs
 
 
 /*   Error value   */
