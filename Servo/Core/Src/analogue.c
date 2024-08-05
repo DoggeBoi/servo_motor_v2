@@ -118,10 +118,12 @@ int16_t rawToCurrent(uint16_t rawData) {
 
 	/*   Initialise variables   */
 	float voltage;
+	float current;
 
 	/*   Data to temperature conversion   */
 	voltage 	= ( rawData / 4095.0f ) * 3.3f;							// Calculate voltage from ADC measurement
+	current		=  -3.544f * voltage + 5.84584f;
 
-	return (int16_t) ( voltage * 1000.00f );							//  mV
+	return (int16_t) ( current * 1000.00f );							//  mV
 }
 
