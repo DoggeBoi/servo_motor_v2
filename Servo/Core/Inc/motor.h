@@ -7,12 +7,15 @@
 
 
 /*   Operating limits   */
-#define MOTOR_DUTY_MAX 		972 	// ~ 95% of 1023 To avoid discharging either bootstrap capacitor
+//#define MOTOR_DUTY_MAX 			972 	// ~ 95% of 1023 To avoid discharging either bootstrap capacitor
+//#define MOTOR_DUTY_MIN			51		// ~ 5% of 1023
+
+#define MOTOR_DUTY_MAX 			972 	// ~ 95% of 1023 To avoid discharging either bootstrap capacitor
 #define MOTOR_DUTY_MIN			51		// ~ 5% of 1023
 
 
 /*   Static friction compensation value   */
-#define MOTOR_STATIC_FRICTION		55
+#define MOTOR_STATIC_FRICTION		25
 
 
 typedef struct {

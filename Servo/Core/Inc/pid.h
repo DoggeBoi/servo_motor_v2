@@ -28,7 +28,7 @@ typedef struct {
 	/*   PID gains   */
 	int16_t  	Kp;
 	int16_t  	Ki;
-	int16_t  	Kd;				   				 	// Tracking Anti-windup gain
+	int16_t  	Kd;
 
 	/*   PID values   */
 	float 		integrator;
@@ -47,7 +47,6 @@ typedef struct {
 	uint16_t 	setPoint;
 	int16_t  	Error;
 	uint16_t 	Input;
-	uint16_t 	prevInput;
 	int16_t	 	prevError;
 
 	/*   PID low-pass filter constant   */
@@ -68,7 +67,7 @@ typedef struct {
 	int16_t 	output;
 
 	/*   PID limited output   */
-	int16_t 	outputLimited; 							// +- 1023
+	int16_t 	outputLimited;
 
 } PID_CTRL;
 

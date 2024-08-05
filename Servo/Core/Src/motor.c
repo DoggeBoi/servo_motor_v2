@@ -66,7 +66,7 @@ void motorPwmDecomp(MOTOR *motor, int16_t input, uint8_t enable, uint8_t directi
 	motor->enabled = enable;
 
 	/*   Correct input based on direction parameter   */
-	int16_t correctedInput = ( ( direction == 0 ) ? input : ( -1 * input -1 ) );				// If inverted, invert input subtract 1 to map -512 -- 511 to 511 -- -512
+	int16_t correctedInput = ( ( direction == 1 ) ? input : ( (-1 * input ) - 1 ) );				// If inverted, invert input subtract 1 to map -512 -- 511 to 511 -- -512
 
 	/*   Add friction compensation value if input is below */
 	if ( abs( correctedInput ) < motor->frictionCompensation ) {

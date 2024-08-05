@@ -19,13 +19,12 @@ void pidInit(PID_CTRL *PID, uint8_t timeStep) {
 	PID->Ki 			  	= 	PID_KI;
 
 	/*   Integrator enable   */
-	PID->integratorEnable	=	1;
+	PID->integratorEnable	=	0;
 
 	/*   Initialise low pass filter parameter   */
 	PID->lpfConstant 	  	= 	PID_LPF;
 
 	/*   Initialise previous values    */
-	PID->prevInput 	  		= 	0;
 	PID->prevError			= 	0;
 
 	/*   Initialise PID terms    */
@@ -46,21 +45,15 @@ void pidUpdate(PID_CTRL *PID, int16_t input, int16_t setpoint) {
 	float Ki		= PID->Ki 			/ 1000.0f;
 	float Kd		= PID->Kd 			/ 100000.0f;
 
-
-	/*   Update PID input   */
-	PID->Input 				= 	input;
-	PID->setPoint			= 	setpoint;
-
-
 	/*   Calculate error   */
-	PID->Error      		= 	PID->setPoint - PID->Input;
+	PID->Error      		= 	setpoint - input;
 
 
 	/*   Calculate PID proportional term   */
 	PID->proportinal 		= 	Kp * PID->Error;
 
 
-	/*   Calculate PID integrator term   */				// Disable change if torque is off./////////////////////////
+	/*   Calculate PID integrator term   */
 	PID->integrator 		= 	( PID->integrator + 0.5f * Ki * timeStep *
 								( PID->Error + PID->prevError ) ) * PID->integratorEnable;
 
@@ -96,7 +89,6 @@ void pidUpdate(PID_CTRL *PID, int16_t input, int16_t setpoint) {
 
 
 	/*   Update previous variables for use in next PID cycle    */
-	PID->prevInput 				= PID->Input;
 	PID->prevError				= PID->Error;
 
     /*   Update external PID values   */
