@@ -10,7 +10,7 @@
 
 
 /*   Base parameters   */
-#define ADC_IIRFILTER_COEFFICIENT 	251
+#define ADC_IIRFILTER_COEFFICIENT 	245
 
 
 /*   Sensor specific conversion function   */
