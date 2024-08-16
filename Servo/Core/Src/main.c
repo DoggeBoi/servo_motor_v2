@@ -106,7 +106,7 @@ void StartDataOutput(void const * argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+uint16_t count = 0; //////////////////////////////////////////////////////////////////////////////////////////////////////////
 /* USER CODE END 0 */
 
 /**
@@ -149,6 +149,8 @@ int main(void)
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
 
+
+
   /*   Run all initialisations   */
   servoCoreInit(&servo);
   servoExtVariablesInit(&servo);
@@ -161,40 +163,47 @@ int main(void)
 
 
 
-  /*   ADC update   */
-  adcSensorUpdate(&servo.intTemp);
-  adcSensorUpdate(&servo.motorTemp);
-  adcSensorUpdate(&servo.batteryVoltage);
-  adcSensorUpdate(&servo.motorCurrent);
+  /*   Read and stabilise sensor readings   */
+  for( int i = 0; i > 1000; i++ ){
 
-  /*   Ensure all values within range before proceeding to with the startup process   */
-  sensorsCheck(&servo);
-
-
-  /*   Send startup data   */
-  dataStartupReady(&servo);
-
-  /*   If initialisation has raised error flag   */
-  if (errorCombine( &servo.error ) != 0) {
-
-	  commandShutdown(&servo, NULL, NULL, NULL);
+	  /*   ADC update   */
+	  adcSensorUpdate(&servo.intTemp);
+	  adcSensorUpdate(&servo.motorTemp);
+	  adcSensorUpdate(&servo.batteryVoltage);
+	  adcSensorUpdate(&servo.motorCurrent);			// CURRENT SHOUDL BE CLOSE TO ZERO!!!
 
   }
+  torqueEnable(&servo, 1);////////////////////////
 
 
-  /*   Standby loop   */
-  while ( servo.startupConfrimation == 0 ) {
-
-  	if ( HAL_CAN_GetRxFifoFillLevel(servo.can.canHandle, CAN_RX_FIFO0) ) {
-
-  			processCanMessages(&servo, CAN_RX_FIFO0);
-
-  		}
-
-  	}
-
-  /*   Send startup data as confirmation   */
-  dataStartupReady(&servo);
+  /*   Ensure all values within range before proceeding to with the startup process   */
+//  sensorsCheck(&servo);
+//
+//
+//  /*   Send startup data   */
+//  dataStartupReady(&servo);
+//
+//  /*   If initialisation has raised error flag   */
+//  if (errorCombine( &servo.error ) != 0) {
+//
+//	  commandShutdown(&servo, NULL, NULL, NULL);
+//
+//  }
+//
+//
+//  /*   Standby loop   */
+//  while ( servo.startupConfrimation == 0 ) {
+//
+//  	if ( HAL_CAN_GetRxFifoFillLevel(servo.can.canHandle, CAN_RX_FIFO0) ) {
+//
+//  			processCanMessages(&servo, CAN_RX_FIFO0);
+//
+//  		}
+//
+//  	}
+//
+//  /*   Send startup data as confirmation   */
+//  dataStartupReady(&servo);
 
   /* USER CODE END 2 */
 
@@ -579,7 +588,7 @@ static void MX_CAN_Init(void)
 
   /* USER CODE END CAN_Init 1 */
   hcan.Instance = CAN;
-  hcan.Init.Prescaler = 9;
+  hcan.Init.Prescaler = 18;
   hcan.Init.Mode = CAN_MODE_NORMAL;
   hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
   hcan.Init.TimeSeg1 = CAN_BS1_2TQ;
@@ -828,10 +837,60 @@ void StartServoUpdate(void const * argument)
 
 	  pidUpdate(&servo.PID, servo.encoder.angle, profileUpdate(&servo.profile, servo.goalPosition) );
 
+
+
 	  motionUpdate(&servo.motion, servo.encoder.angle);
 
-	  motorPwmDecomp(&servo.motor, servo.PID.outputLimited, servo.torqueEnable, servo.motionDirection);
+	  motorPwmDecomp(&servo.motor, currentLimit(&servo.current, servo.motorCurrent.converData, 0, servo.PID.outputLimited), servo.torqueEnable, servo.motionDirection);
 	  motorUpdate(&servo.motor);
+
+
+
+
+	  // Test motion
+
+	  	 	 if (count == 0 ){
+	  	 		 	 	 servo.goalPosition  = 5000;
+
+	  	 	 	}
+	  	 	 if (count == 200 ){
+	  	 			 		servo.goalPosition  = 5000;
+
+	  	 		 	}
+	  	 	 if (count == 400 ){
+	  	 	 			 	servo.goalPosition  = 5000;
+
+	  	 	 		 	}
+	  	 	 if (count == 600 ){
+	  	 	 			 	servo.goalPosition  = 5000;
+
+
+	  	 	 		 	}
+	  	 	 if (count == 800 ){
+	  	 	 			 	servo.goalPosition  = 5000;
+
+	  	 	 		 	}
+	  	 	 if (count == 1000 ){
+	  	 	 			 	servo.goalPosition  = 7300;
+
+	  	 	 		 	}
+	  	 	 if (count == 1200 ){
+	  	 	 			 	servo.goalPosition  = 3552;
+
+	  	 	 		 	}
+	  	 	 if (count == 1400 ){
+	  	 		 	 	 	servo.goalPosition  = 12000;
+
+
+	  	 	 				count = 0;
+	  	 	 		 	}
+	  	 	count += 1;
+
+
+
+
+
+
 
 
     osDelay(servo.timeStep);
@@ -923,7 +982,7 @@ void StartHealthCheck(void const * argument)
   {
 
 	/*   Check connection and disable servo if failed*/
-	servoConnectionCheck(&servo);
+	//servoConnectionCheck(&servo);											/////////////////////////////////////////ENABLE AGAIN!!!!!!!!!!!!!!!!!!!!!!!!////////////////
 
     osDelay(SERVO_CHECK_INTERVAL);
 
@@ -950,11 +1009,20 @@ void StartDataOutput(void const * argument)
 
 	  for ( uint8_t i = 0; i < 3; i++ ) {
 
-		  readStandard(&servo, PRIORITY_MODERATE, i);
+		  //readStandard(&servo, PRIORITY_MODERATE, i);////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	  }
 
-    osDelay(SERVO_CHECK_INTERVAL);
+	  uint8_t tx[] = {(servo.profile.trajectorySetPoint >> 8) & 0xFF, servo.profile.trajectorySetPoint & 0xFF,
+			  	  	  (servo.encoder.angle >> 8) & 0xFF, servo.encoder.angle & 0xFF,
+					  (servo.PID.outputLimited >> 8) & 0xFF, servo.PID.outputLimited & 0xFF,
+					  (servo.motorCurrent.converData >> 8) & 0xFF, servo.motorCurrent.converData & 0xFF
+	  };
+
+	  CAN_SendDataFrame(&servo.can, tx, 8, 0, 0);/////////////////////////////// TYEMP
+
+
+    osDelay(SERVO_DATA_INTERVAL);
 
   }
 
