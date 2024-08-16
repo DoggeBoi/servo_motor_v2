@@ -13,7 +13,7 @@
 
 /*   Base PID gains   */
 #define PID_KP				1500					// 1.5
-#define PID_KD				1500					// 0.015
+#define PID_KD				100						// 0.001
 #define PID_KI				125						// 0.125
 
 

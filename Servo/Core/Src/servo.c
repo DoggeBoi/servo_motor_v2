@@ -12,6 +12,7 @@
 #include "LSM6DSO.h"
 #include "motion.h"
 #include "error.h"
+#include "current.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -39,7 +40,6 @@ void servoCoreInit(SERVO_CONTROL *servo) {
 	servo->maxIntTemp 						= SERVO_MAX_INTERNAL_TEMP;
 	servo->maxVoltage 						= SERVO_MAX_VOLTAGE;
 	servo->minVoltage 						= SERVO_MIN_VOLTAGE;
-	servo->maxCurrent 						= SERVO_MAX_CURRENT;
 
 	servo->timeStep							= SERVO_UPDATE_INTERVAL;
 
@@ -47,11 +47,12 @@ void servoCoreInit(SERVO_CONTROL *servo) {
 	servo->commsConfrimation				= 0;
 	servo->startupConfrimation 				= 0;
 
-	pidInit		(&servo->PID, 	  servo->timeStep);
-	motionInit	(&servo->motion,  servo->timeStep);
-	profileInit	(&servo->profile, servo->timeStep);
+	pidInit		(&servo->PID, 	  	servo->timeStep);
+	currentInit	(&servo->current);
+	motionInit	(&servo->motion,  	servo->timeStep);
+	profileInit	(&servo->profile, 	servo->timeStep);
 	errorInit	(&servo->error);
-
+	currentInit	(&servo->current);
 }
 
 
@@ -169,8 +170,6 @@ void sensorsCheck(SERVO_CONTROL *servo) {
 
 	status += adcSensorRangeCheck(&servo->batteryVoltage, 	&servo->error.overTempMCU, SERVO_MAX_VOLTAGE, SERVO_MIN_VOLTAGE);
 
-	status += adcSensorRangeCheck(&servo->motorCurrent, 	&servo->error.overTempMCU, SERVO_MAX_CURRENT, -SERVO_MAX_CURRENT);
-
 	/*   If range error has occurred call error handler   */
 	if ( status != 0 ) {
 
@@ -197,6 +196,8 @@ void torqueEnable(SERVO_CONTROL *servo, uint8_t direction) {
 	AS5048A_ReadAngle(&servo->encoder);
 
 	servo->goalPosition = servo->encoder.angle;
+
+	profileResetFrom(&servo->profile, servo->motion.velocity, servo->encoder.angle);
 
 	servo->torqueEnable = SERVO_TORQUE_ENABLE;
 	pidIntegratorEnable(&servo->PID);

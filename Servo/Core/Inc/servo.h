@@ -14,6 +14,8 @@
 #include "LSM6DSO.h"
 #include "motion.h"
 #include "error.h"
+#include "current.h"
+
 #include "cmsis_os.h"
 
 /*   Default values   -------------------------------------   */
@@ -39,7 +41,6 @@
 #define SERVO_MIN_VOLTAGE			8000					// 8 V
 #define SERVO_MAX_MOTOR_TEMP		8000					// 80 °C
 #define SERVO_MAX_INTERNAL_TEMP		8000					// 80 °C
-#define SERVO_MAX_CURRENT			3000					// 3 A
 
 
 /*   Base PID loop sample interval and filter constant  */
@@ -91,6 +92,9 @@ typedef struct {
 
 	/*   PID parameters   */
 	PID_CTRL  	PID;
+
+	/*  Current controller parameters   */
+	CURRENT_CTRL current;
 
 
 	/*   Rotary encoder   */

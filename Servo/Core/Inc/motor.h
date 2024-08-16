@@ -15,7 +15,7 @@
 
 
 /*   Static friction compensation value   */
-#define MOTOR_STATIC_FRICTION		25
+#define MOTOR_STATIC_FRICTION		0
 
 
 typedef struct {

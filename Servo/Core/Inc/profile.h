@@ -85,4 +85,7 @@ uint16_t profileUpdate(PROFILE *profile, int16_t goalPosition);		// Returns set-
 void profileFollowing(PROFILE *profile, uint16_t realAngle);
 
 
+/*   Reset trajectory calculation from..  */
+void profileResetFrom(PROFILE *profile, int16_t velocity, uint16_t angle);
+
 #endif /* INC_PROFILE_H_ */

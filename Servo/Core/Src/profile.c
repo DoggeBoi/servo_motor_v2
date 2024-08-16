@@ -216,3 +216,12 @@ void profileFollowing(PROFILE *profile, uint16_t realAngle) {
 	profile->trajectoryFollowing = ( abs( profile->trajectorySetPoint - realAngle ) <= profile->followingThreshold );
 
 }
+
+
+/*   Reset trajectory calculation from..  */
+void profileResetFrom(PROFILE *profile, int16_t velocity, uint16_t angle){						// Sets start velocity and position to avoid jolt when enabling torque
+
+	profile->trajectoryVelocity = velocity;
+	profile->trajectorySetPoint = angle;
+
+}
